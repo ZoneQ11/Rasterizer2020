@@ -55,7 +55,14 @@ namespace Template
 			GL.MatrixMode( MatrixMode.Projection );
 			GL.LoadIdentity();
 			GL.Ortho( -1.0, 1.0, -1.0, 1.0, 0.0, 4.0 );
-		}
+
+            // If our window is minimized then size becomes (0, 0) and the canvas can't be size (0, 0).
+            if (Width > 0 && Height > 0)
+            {
+                app.screen = new Surface(Width, Height);
+                screenID = app.screen.GenTexture();
+            }
+        }
 		protected override void OnUpdateFrame( FrameEventArgs e )
 		{
 			// called once per frame; app logic

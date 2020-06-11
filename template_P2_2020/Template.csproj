@@ -52,6 +52,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="quad.cs" />
     <Compile Include="rendertarget.cs" />
+    <Compile Include="sceneGraph.cs" />
     <Compile Include="shader.cs" />
     <Compile Include="surface.cs" />
     <Compile Include="template.cs" />

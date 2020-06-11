@@ -102,9 +102,7 @@ namespace Template
 		{
 			int dest = y1 * width;
 			for( int y = y1; y <= y2; y++, dest += width ) for( int x = x1; x <= x2; x++ )
-				{
 					pixels[dest + x] = c;
-				}
 		}
 		// helper function for line clipping
 		int OUTCODE( int x, int y )
@@ -166,9 +164,7 @@ namespace Template
 		public void Plot( int x, int y, int c )
 		{
 			if( (x >= 0) && (y >= 0) && (x < width) && (y < height) )
-			{
 				pixels[x + y * width] = c;
-			}
 		}
 		// print a string
 		public void Print( string t, int x, int y, int c )
@@ -192,9 +188,7 @@ namespace Template
 				int dest = x + i * 12 + y * width;
 				int src = f * 12;
 				for( int v = 0; v < font.height; v++, src += font.width, dest += width ) for( int u = 0; u < 12; u++ )
-					{
 						if( (font.pixels[src + u] & 0xffffff) != 0 ) pixels[dest + u] = c;
-					}
 			}
 		}
 	}

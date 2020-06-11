@@ -8,3 +8,13 @@ C:\Users\Zone Q11\Documents\University - Documents\template_P2_2020\obj\Debug\Te
 C:\Users\Zone Q11\Documents\University - Documents\template_P2_2020\obj\Debug\Template.csproj.CopyComplete
 C:\Users\Zone Q11\Documents\University - Documents\template_P2_2020\obj\Debug\INFOGR2019Tmpl8.exe
 C:\Users\Zone Q11\Documents\University - Documents\template_P2_2020\obj\Debug\INFOGR2019Tmpl8.pdb
+C:\Users\Zone Q11\Documents\GitHub\Rasterizer2020\template_P2_2020\bin\Debug\INFOGR2019Tmpl8.exe.config
+C:\Users\Zone Q11\Documents\GitHub\Rasterizer2020\template_P2_2020\bin\Debug\INFOGR2019Tmpl8.exe
+C:\Users\Zone Q11\Documents\GitHub\Rasterizer2020\template_P2_2020\bin\Debug\INFOGR2019Tmpl8.pdb
+C:\Users\Zone Q11\Documents\GitHub\Rasterizer2020\template_P2_2020\bin\Debug\OpenTK.dll
+C:\Users\Zone Q11\Documents\GitHub\Rasterizer2020\template_P2_2020\bin\Debug\OpenTK.pdb
+C:\Users\Zone Q11\Documents\GitHub\Rasterizer2020\template_P2_2020\bin\Debug\OpenTK.xml
+C:\Users\Zone Q11\Documents\GitHub\Rasterizer2020\template_P2_2020\obj\Debug\Template.csprojAssemblyReference.cache
+C:\Users\Zone Q11\Documents\GitHub\Rasterizer2020\template_P2_2020\obj\Debug\Template.csproj.CopyComplete
+C:\Users\Zone Q11\Documents\GitHub\Rasterizer2020\template_P2_2020\obj\Debug\INFOGR2019Tmpl8.exe
+C:\Users\Zone Q11\Documents\GitHub\Rasterizer2020\template_P2_2020\obj\Debug\INFOGR2019Tmpl8.pdb

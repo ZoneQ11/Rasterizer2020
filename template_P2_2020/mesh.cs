@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using OpenTK;
 using OpenTK.Graphics.OpenGL;
@@ -13,19 +14,31 @@ namespace Template
 		public ObjVertex[] vertices;            // vertex positions, model space
 		public ObjTriangle[] triangles;         // triangles (3 vertex indices)
 		public ObjQuad[] quads;                 // quads (4 vertex indices)
-		int vertexBufferId;                     // vertex buffer
-		int triangleBufferId;                   // triangle buffer
-		int quadBufferId;                       // quad buffer
+		int vertexBufferId,                     // vertex buffer
+		    triangleBufferId,                   // triangle buffer
+		    quadBufferId;                       // quad buffer
 
-		// constructor
-		public Mesh( string fileName )
-		{
-			MeshLoader loader = new MeshLoader();
-			loader.Load( this, fileName );
-		}
+        public List<Mesh> meshes = new List<Mesh>();
+        public Matrix4 local = new Matrix4(
+            new Vector4(1, 0, 0, 0),
+            new Vector4(0, 1, 0, 0),
+            new Vector4(0, 0, 1, 0),
+            new Vector4(0, 0, 0, 1));
 
-		// initialization; called during first render
-		public void Prepare( Shader shader )
+        Light[] lights;
+        Texture texture;
+
+        // constructor
+        public Mesh(string fileName, Texture texture, Light[] lights)
+        {
+            MeshLoader loader = new MeshLoader();
+            loader.Load(this, fileName);
+            this.texture = texture;
+            this.lights = lights;
+        }
+
+        // initialization; called during first render
+        public void Prepare( Shader shader )
 		{
 			if( vertexBufferId == 0 )
 			{
@@ -47,7 +60,7 @@ namespace Template
 		}
 
 		// render the mesh using the supplied shader and matrix
-		public void Render( Shader shader, Matrix4 transform, Texture texture )
+		public void Render( Shader shader, Matrix4 transform )
 		{
 			// on first run, prepare buffers
 			Prepare( shader );
