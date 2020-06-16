@@ -46,6 +46,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Light.cs" />
     <Compile Include="mesh.cs" />
     <Compile Include="meshLoader.cs" />
     <Compile Include="MyApplication.cs" />

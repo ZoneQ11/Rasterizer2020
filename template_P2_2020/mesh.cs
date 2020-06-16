@@ -79,9 +79,15 @@ namespace Template
 
 			// pass transform to vertex shader
 			GL.UniformMatrix4( shader.uniform_mview, false, ref transform );
+            GL.UniformMatrix4( shader.uniform_2wrld, false, ref local );
 
-			// enable position, normal and uv attributes
-			GL.EnableVertexAttribArray( shader.attribute_vpos );
+            // pass light to shader
+            GL.Uniform4(shader.lpos, lights[0].pos);
+            GL.Uniform3(shader.lcol, new Vector3[] array {  }/*lights[0].color*/);
+            //GL.Uniform3(shader.ld0, lights[0].dir);
+            
+            // enable position, normal and uv attributes
+            GL.EnableVertexAttribArray( shader.attribute_vpos );
 			GL.EnableVertexAttribArray( shader.attribute_vnrm );
 			GL.EnableVertexAttribArray( shader.attribute_vuvs );
 

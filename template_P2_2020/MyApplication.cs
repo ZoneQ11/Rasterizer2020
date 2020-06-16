@@ -32,14 +32,14 @@ namespace Template
 		{
             // load texture and light
             wood = new Texture("../../assets/wood.jpg");
-            lights[0] = new Light();
+            lights[0] = new Light(new Vector4(0, 14.5f, 0, 1), new Vector3(8.0f, 8.0f, 8.0f)/*, Vector3.Zero*/);
 
             // load teapot
-            mesh = new Mesh( "../../assets/teapot.obj", wood, lights );
-			floor = new Mesh( "../../assets/floor.obj", wood, lights );
+            mesh = new Mesh("../../assets/teapot.obj", wood, lights);
+            floor = new Mesh("../../assets/floor.obj", wood, lights);
 
-			// initialize stopwatch
-			timer = new Stopwatch();
+            // initialize stopwatch
+            timer = new Stopwatch();
 			timer.Reset();
             timer.Start();
 			// create shaders

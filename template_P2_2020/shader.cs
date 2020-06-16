@@ -6,10 +6,11 @@ namespace Template
 {
 	public class Shader
 	{
-		// data members
-		public int programID, vsID, fsID,                       // Identifications
+        // data members
+        public int programID, vsID, fsID,                       // Identifications
             attribute_vpos, attribute_vnrm, attribute_vuvs,     // Attributes
-            uniform_mview;                                      // Uniforms
+            uniform_mview, uniform_2wrld,                       // Uniforms
+            lpos, lcol; //ldir;                                      // Light(s)
 
 		// constructor
 		public Shader( String vertexShader, String fragmentShader )
@@ -26,10 +27,13 @@ namespace Template
 			attribute_vnrm = GL.GetAttribLocation( programID, "vNormal" );
 			attribute_vuvs = GL.GetAttribLocation( programID, "vUV" );
 			uniform_mview = GL.GetUniformLocation( programID, "transform" );
+            uniform_2wrld = GL.GetUniformLocation(programID, "toWorld");
+            lpos = GL.GetUniformLocation(programID, "lp0");
+            lcol = GL.GetUniformLocation(programID, "lc0");
         }
 
-		// loading shaders
-		void Load( String filename, ShaderType type, int program, out int ID )
+        // loading shaders
+        void Load( String filename, ShaderType type, int program, out int ID )
 		{
 			// source: http://neokabuto.blogspot.nl/2013/03/opentk-tutorial-2-drawing-triangle.html
 			ID = GL.CreateShader( type );
