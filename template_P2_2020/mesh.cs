@@ -18,7 +18,7 @@ namespace Template
 		    triangleBufferId,                   // triangle buffer
 		    quadBufferId;                       // quad buffer
 
-        public List<Mesh> meshes = new List<Mesh>();
+        public List<Mesh> children = new List<Mesh>();
         public Matrix4 local = new Matrix4(
             new Vector4(1, 0, 0, 0),
             new Vector4(0, 1, 0, 0),
@@ -59,33 +59,37 @@ namespace Template
 			}
 		}
 
-		// render the mesh using the supplied shader and matrix
-		public void Render( Shader shader, Matrix4 transform )
-		{
-			// on first run, prepare buffers
-			Prepare( shader );
+        // render the mesh using the supplied shader and matrix
+        public void Render(Shader shader, Matrix4 transform)
+        {
+            // on first run, prepare buffers
+            Prepare(shader);
 
-			// safety dance
-			GL.PushClientAttrib( ClientAttribMask.ClientVertexArrayBit );
+            // safety dance
+            GL.PushClientAttrib(ClientAttribMask.ClientVertexArrayBit);
 
-			// enable texture
-			int texLoc = GL.GetUniformLocation( shader.programID, "pixels" );
-			GL.Uniform1( texLoc, 0 );
-			GL.ActiveTexture( TextureUnit.Texture0 );
-			GL.BindTexture( TextureTarget.Texture2D, texture.id );
+            // enable texture
+            int texLoc = GL.GetUniformLocation(shader.programID, "pixels");
+            GL.Uniform1(texLoc, 0);
+            GL.ActiveTexture(TextureUnit.Texture0);
+            GL.BindTexture(TextureTarget.Texture2D, texture.id);
 
-			// enable shader
-			GL.UseProgram( shader.programID );
+            // enable shader
+            GL.UseProgram(shader.programID);
 
-			// pass transform to vertex shader
-			GL.UniformMatrix4( shader.uniform_mview, false, ref transform );
-            GL.UniformMatrix4( shader.uniform_2wrld, false, ref local );
+            // pass transform to vertex shader
+            GL.UniformMatrix4(shader.uniform_mview, false, ref transform);
+            GL.UniformMatrix4(shader.uniform_2wrld, false, ref local);
 
             // pass light to shader
-            GL.Uniform4(shader.lpos, lights[0].pos);
-            GL.Uniform3(shader.lcol, new Vector3[] array {  }/*lights[0].color*/);
-            //GL.Uniform3(shader.ld0, lights[0].dir);
-            
+            GL.Uniform1(shader.numLights, shader.uLights.Length);
+            for (int i = 0; i < shader.uLights.Length; i++)
+            {
+                GL.Uniform4(shader.uLights[i].lpos, lights[i].pos);
+                GL.Uniform3(shader.uLights[i].lcol, lights[i].color);
+                //GL.Uniform3(shader.uLights[i].ldir, lights[i].dir);
+            }
+
             // enable position, normal and uv attributes
             GL.EnableVertexAttribArray( shader.attribute_vpos );
 			GL.EnableVertexAttribArray( shader.attribute_vnrm );

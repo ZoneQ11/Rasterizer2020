@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using OpenTK;
+using OpenTK.Input;
 
 namespace Template
 {
@@ -9,13 +9,16 @@ namespace Template
     {
         public Vector4 pos;
         public Vector3 color, baseColor, dir;
+        public Key key;
 
-        public Light(Vector4 pos, Vector3 color/*, Vector3 dir*/)
+        public Light(Vector4 pos, Vector3 color/*, Vector3 dir*/, Key switchKey)
         {
             this.pos = pos;
             this.color = color;
             baseColor = color;
             //this.dir = dir;
+
+            key = switchKey;
         }
 
         /// <summary>
@@ -28,5 +31,12 @@ namespace Template
             else
                 color = Vector3.Zero;
         }
+    }
+
+    public struct UniformLight
+    {
+        public int lpos { get; set; }
+        public int lcol { get; set; }
+        //public int ldir { get; set; }
     }
 }

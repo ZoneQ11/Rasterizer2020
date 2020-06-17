@@ -9,14 +9,16 @@ namespace Template
         // data members
         public int programID, vsID, fsID,                       // Identifications
             attribute_vpos, attribute_vnrm, attribute_vuvs,     // Attributes
-            uniform_mview, uniform_2wrld,                       // Uniforms
-            lpos, lcol; //ldir;                                      // Light(s)
+            uniform_mview, uniform_2wrld, numLights;            // Uniforms
+        public UniformLight[] uLights;                          // Light(s)
 
 		// constructor
-		public Shader( String vertexShader, String fragmentShader )
+		public Shader( String vertexShader, String fragmentShader, UniformLight[] uLights )
 		{
-			// compile shaders
-			programID = GL.CreateProgram();
+            this.uLights = uLights;
+
+            // compile shaders
+            programID = GL.CreateProgram();
 			Load( vertexShader, ShaderType.VertexShader, programID, out vsID );
 			Load( fragmentShader, ShaderType.FragmentShader, programID, out fsID );
 			GL.LinkProgram( programID );
@@ -28,8 +30,14 @@ namespace Template
 			attribute_vuvs = GL.GetAttribLocation( programID, "vUV" );
 			uniform_mview = GL.GetUniformLocation( programID, "transform" );
             uniform_2wrld = GL.GetUniformLocation(programID, "toWorld");
-            lpos = GL.GetUniformLocation(programID, "lp0");
-            lcol = GL.GetUniformLocation(programID, "lc0");
+            numLights = GL.GetUniformLocation(programID, "numLights");
+
+            for (int i = 0; i < uLights.Length; i++)
+            {
+                uLights[i].lpos = GL.GetUniformLocation(programID, $"lights[{i}].pos");
+                uLights[i].lcol = GL.GetUniformLocation(programID, $"lights[{i}].col");
+                //uLights[i].ldir = GL.GetUniformLocation(programID, $"lights[{i}].dir");
+            }
         }
 
         // loading shaders
