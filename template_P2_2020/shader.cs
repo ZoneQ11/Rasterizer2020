@@ -7,7 +7,7 @@ namespace Template
 	public class Shader
 	{
         // data members
-        public int programID, vsID, fsID,                       // Identifications
+        public int programID, vsID, fsID, viewID,               // Identifications
             attribute_vpos, attribute_vnrm, attribute_vuvs,     // Attributes
             uniform_mview, uniform_2wrld, numLights;            // Uniforms
         public UniformLight[] uLights;                          // Light(s)
@@ -31,6 +31,7 @@ namespace Template
 			uniform_mview = GL.GetUniformLocation( programID, "transform" );
             uniform_2wrld = GL.GetUniformLocation(programID, "toWorld");
             numLights = GL.GetUniformLocation(programID, "numLights");
+            viewID = GL.GetUniformLocation(programID, "viewPos");
 
             for (int i = 0; i < uLights.Length; i++)
             {

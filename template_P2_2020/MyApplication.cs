@@ -29,7 +29,7 @@ namespace Template
 
         KeyboardState keyState, lastKeyState;
 
-        bool useRenderTarget = false;           // let's not use postproduct for now...
+        bool useRenderTarget = true;           // let's not use postproduct for now...
 
 		// initialize
 		public void Init()
@@ -39,8 +39,10 @@ namespace Template
 
             // load lights
             List<Light> ls = new List<Light>();
-            ls.Add(new Light(new Vector4(0, 14.5f, -5, 1), new Vector3(0.0f, 8.0f, 0.0f), Key.Number1));
-            ls.Add(new Light(new Vector4(0, 14.5f, 5, 1), new Vector3(8.0f, 0.0f, 8.0f), Key.Number2));
+            ls.Add(new Light(new Vector4(12, 5, -10, 1), new Vector3(8.0f, 8.0f, 8.0f), Key.Number1));
+            ls.Add(new Light(new Vector4(0.5f, 2, 0, 1), new Vector3(8.0f, 0.0f, 0.0f), Key.Number2));
+            ls.Add(new Light(new Vector4(0.8f, 2, 0, 1), new Vector3(0.0f, 8.0f, 0.0f), Key.Number3));
+            ls.Add(new Light(new Vector4(1, 2, 0, 1), new Vector3(0.0f, 0.0f, 8.0f), Key.Number4));
             lights = ls.ToArray();
 
             // load teapot
@@ -115,9 +117,9 @@ namespace Template
 			// prepare matrix for vertex shader
 			float angle90degrees = PI / 2;
 
-            Matrix4 Tpot = Matrix4.CreateScale( 0.5f ) * Matrix4.CreateFromAxisAngle( new Vector3( 0, 1, 0 ), a );
-            Matrix4 Tfloor = Matrix4.CreateScale( 4.0f ) * Matrix4.CreateFromAxisAngle( new Vector3( 0, 1, 0 ), a );
-            teapot.local = Matrix4.CreateScale(0.125f) * Matrix4.CreateTranslation(new Vector3(0, 0, 0)) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), a);
+            //Matrix4 Tpot = Matrix4.CreateScale( 0.5f ) * Matrix4.CreateFromAxisAngle( new Vector3( 0, 1, 0 ), a );
+            //Matrix4 Tfloor = Matrix4.CreateScale( 1.0f ) * Matrix4.CreateFromAxisAngle( new Vector3( 0, 1, 0 ), a );
+            teapot.local = Matrix4.CreateScale(.125f) * Matrix4.CreateTranslation(new Vector3(0, 0, 0)) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), a);
             floor.local = Matrix4.CreateScale(4.0f) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), 0);
 
             Matrix4 camRotation = new Matrix4(
@@ -126,9 +128,10 @@ namespace Template
                 new Vector4(-(float)Math.Sin(cam_rot), 0, (float)Math.Cos(cam_rot), 0),
                 new Vector4(0, 0, 0, 1));
 
-            Matrix4 Tcamera = Matrix4.CreateTranslation( new Vector3( cam_x, cam_y - 14.5f, cam_z ) )
-                * Matrix4.CreateFromAxisAngle( new Vector3( 1, 0, 0 ), angle90degrees );
+            Matrix4 Tcamera = Matrix4.CreateTranslation( new Vector3( cam_x, cam_y - 14.5f, cam_z ) ) * Matrix4.CreateFromAxisAngle( new Vector3( 1, 0, 0 ), angle90degrees );
 			Matrix4 Tview = Matrix4.CreatePerspectiveFieldOfView( 1.2f, 1.3f, .1f, 1000 );
+
+            Vector3 viewPos = -Tcamera.ExtractTranslation();
 
             // update rotation
             a += 0.001f * frameDuration;
@@ -143,7 +146,7 @@ namespace Template
                 // render scene to render target
                 //teapot.Render( shader, Tpot * Tcamera * Tview );
                 //floor.Render( shader, Tfloor * Tcamera * Tview );
-                scene.Render(world, shader, camRotation * Tcamera * Tview);
+                scene.Render(world, shader, camRotation * Tcamera * Tview, viewPos);
 
                 // render quad
                 target.Unbind();
@@ -154,7 +157,7 @@ namespace Template
                 // render scene directly to the screen
                 //teapot.Render( shader, Tpot * Tcamera * Tview );
                 //floor.Render( shader, Tfloor * Tcamera * Tview );
-                scene.Render( world, shader, camRotation * Tcamera * Tview );
+                scene.Render( world, shader, camRotation * Tcamera * Tview, viewPos );
             }
         }
 	}

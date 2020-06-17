@@ -5,13 +5,13 @@ in vec2 uv;					// interpolated texture coordinates
 in vec4 normal;				// interpolated normal
 in vec4 worldPos;
 uniform sampler2D pixels;	// texture sampler
+uniform vec3 viewPos;       // camera position
 
 // shader output
 out vec4 outputColor;
 
 // lights
 uniform int numLights;
-uniform vec3 lightPos;
 uniform vec3 ambient = vec3(0.05f,0.05f,0.05f);
 
 // lights
@@ -26,16 +26,18 @@ uniform Light lights[20];
 vec4 calcLight (Light l)
 {
 	vec3 L  = l.pos.xyz - worldPos.xyz;
+	vec3 normal = normalize(normal.xyz);
 	float dist = L.length();
 
 	L = normalize( L );
 	vec3 materialColor = texture( pixels, uv ).xyz;
 	float attenuation = 1.0f / (dist * dist);
 
-	vec3 Rv = reflect(L,normal.xyz);
+	vec3 Rv = reflect(-L,normal);
+	vec3 viewDir = normalize(viewPos - worldPos.xyz);
 
-	vec3 diffuse = materialColor * max( 0.0f, dot( L, normal.xyz ) ) * attenuation * l.col;
-	vec3 specular = materialColor * pow( max( 0.0f, dot( L, Rv ) ), 10.0f) *attenuation * l.col;
+	vec3 diffuse = materialColor * attenuation * l.col * max( 0.0f, dot( L, normal ) );
+	vec3 specular = materialColor * attenuation * l.col * pow( max( 0.0f, dot( viewDir, Rv ) ), 128.0f);
 
 	vec4 pixelColor = vec4( diffuse + specular, 1);
 	return pixelColor;

@@ -15,11 +15,9 @@ void main()
 	// apply dummy postprocessing effect
 	//float dist = P.x * P.x + P.y * P.y;
 	//outputColor *= sin( dist * 50 ) * 0.25f + 0.75f;
-	vec4 r = texture( pixels, vec2 (uv[0] - 0.001, uv[1] - 0.001) );
-	vec4 g = texture( pixels, vec2 (uv[0], uv[1]) );
-	vec4 b = texture( pixels, vec2 (uv[0] - 0.002, uv[1] - 0.002) );
+	vec4 r = texture( pixels, vec2 (uv[0], uv[1]) );
 
-	outputColor = vec3(r.r, g.g, b.b);
+	outputColor = vec3(r.r, r.g, r.b);
 	outputColor *= 1-pow(sqrt(pow(uv[0],2)+pow(uv[1],2)),1.5);
 }
 

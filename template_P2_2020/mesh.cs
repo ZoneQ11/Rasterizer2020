@@ -60,7 +60,7 @@ namespace Template
 		}
 
         // render the mesh using the supplied shader and matrix
-        public void Render(Shader shader, Matrix4 transform)
+        public void Render(Shader shader, Matrix4 transform, Vector3 viewPos)
         {
             // on first run, prepare buffers
             Prepare(shader);
@@ -76,6 +76,8 @@ namespace Template
 
             // enable shader
             GL.UseProgram(shader.programID);
+
+            GL.Uniform3(shader.viewID, viewPos);
 
             // pass transform to vertex shader
             GL.UniformMatrix4(shader.uniform_mview, false, ref transform);

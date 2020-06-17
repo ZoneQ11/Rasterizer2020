@@ -12,7 +12,7 @@ out vec2 P;					// position pass-through
 void main()
 {
 	uv = vUV;
-	P = vec2( vPosition ) * 0.5f; //+ vec2( 0.5, 0.5 );
+	P = vec2( vPosition ) * 0.5f + vec2( 0.5, 0.5 );
 	gl_Position = vec4( vPosition, 1 );
 }
 
