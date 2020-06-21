@@ -27,6 +27,8 @@ namespace Template
 
         Light[] lights;
         Texture texture;
+        public float a;
+
 
         // constructor
         public Mesh(string fileName, Texture texture, Light[] lights)
@@ -35,6 +37,7 @@ namespace Template
             loader.Load(this, fileName);
             this.texture = texture;
             this.lights = lights;
+            a = 0;
         }
 
         // initialization; called during first render
@@ -60,7 +63,7 @@ namespace Template
 		}
 
         // render the mesh using the supplied shader and matrix
-        public void Render(Shader shader, Matrix4 transform, Vector3 viewPos)
+        public virtual void Render(Shader shader, Matrix4 transform, Vector3 viewPos)
         {
             // on first run, prepare buffers
             Prepare(shader);
@@ -146,4 +149,22 @@ namespace Template
 			public int Index0, Index1, Index2, Index3;
 		}
 	}
+
+    public class Bullet : Mesh
+    {
+        private Vector3 velocity;
+
+        public Bullet(string fileName, Texture texture, Light[] lights, Vector3 velocity)
+			: base (fileName, texture, lights)
+        {
+            this.velocity = velocity;
+            local = Matrix4.CreateTranslation(new Vector3(0, 12, 0)) * Matrix4.CreateScale(.025f);
+        }
+
+        public override void Render(Shader shader, Matrix4 transform, Vector3 viewPos)
+        {
+            local *= Matrix4.CreateTranslation(velocity);
+            base.Render(shader, transform, viewPos);
+        }
+    }
 }
