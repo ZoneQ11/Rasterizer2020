@@ -26,9 +26,9 @@ namespace Template
             new Vector4(0, 0, 0, 1));
 
         Light[] lights;
-        Texture texture;
-        public float a;
-
+        Texture texture;    // Texture argument removed from Render() and instead put in the constructor
+                            // otherwise the scenegraph would only be able to use one texture
+        public float a;		// variable used for rotation based on elapsed milliseconds
 
         // constructor
         public Mesh(string fileName, Texture texture, Light[] lights)
@@ -92,7 +92,9 @@ namespace Template
             {
                 GL.Uniform4(shader.uLights[i].lpos, lights[i].pos);
                 GL.Uniform3(shader.uLights[i].lcol, lights[i].color);
-                //GL.Uniform3(shader.uLights[i].ldir, lights[i].dir);
+                GL.Uniform3(shader.uLights[i].ldir, lights[i].dir);
+                GL.Uniform1(shader.uLights[i].cutOff, lights[i].cutOff);
+                GL.Uniform1(shader.uLights[i].outerCutOff, lights[i].outerCutOff);
             }
 
             // enable position, normal and uv attributes
@@ -150,6 +152,7 @@ namespace Template
 		}
 	}
 
+	// special mesh with a velocity that updates the mesh's position at every tick
     public class Bullet : Mesh
     {
         private Vector3 velocity;
@@ -163,6 +166,7 @@ namespace Template
 
         public override void Render(Shader shader, Matrix4 transform, Vector3 viewPos)
         {
+			// update the position using the velocity
             local *= Matrix4.CreateTranslation(velocity);
             base.Render(shader, transform, viewPos);
         }

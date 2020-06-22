@@ -9,22 +9,23 @@ namespace Template
 	class MyApplication
 	{
         const int bulletDespawnDistance = 16;
-        const float bulletSpeed = 0.05f, bulletSpawnDistanceFromTurretCenter = 1.0f;
+        const float PI = 3.1415926535f,
+            bulletSpeed = 0.05f,
+            bulletSpawnDistanceFromTurretCenter = 1.0f;
 
-		// member variables
-		public Surface screen;                  // background surface for printing etc.
+        // member variables
+        public Surface screen;                  // background surface for printing etc.
         public Light[] lights;                  // array with the lights
 
-        SceneGraph scene = new SceneGraph();
-        List<Mesh> world = new List<Mesh>();
+        SceneGraph scene = new SceneGraph();    // the scenegraph
+        List<Mesh> world = new List<Mesh>();    // the list of meshes where all objects reside; the world
 
         Mesh turret, floor;                     // a mesh to draw using OpenGL
-		const float PI = 3.1415926535f;         // PI
         float cam_x = 0.0f,
             cam_y = 0.0f,
             cam_z = 0.0f,
-            cam_rot = 0.0f;                     // camera position
-        float turret_rot = 0.0f;
+            cam_rot = 0.0f;                     // camera positions and rotations
+        float turret_rot = 0.0f;                // turret rotation
 
 		Stopwatch timer;                        // timer for measuring frame duration
 		Shader shader,                          // shader to use for rendering
@@ -33,10 +34,10 @@ namespace Template
 		RenderTarget target;                    // intermediate render target
 		ScreenQuad quad;                        // screen filling quad for post processing
 
-        KeyboardState keyState, lastKeyState;
-        MouseState mouseState, lastMouseState;
+        KeyboardState keyState, lastKeyState;   // keyboard states
+        MouseState mouseState, lastMouseState;  // mouse states
 
-        bool useRenderTarget = false;           // let's not use postproduct for now...
+        bool useRenderTarget = true;            // post-processing
 
 		// initialize
 		public void Init()
@@ -46,17 +47,18 @@ namespace Template
 
             // load lights
             List<Light> ls = new List<Light>();
-            ls.Add(new Light(new Vector4(12, 5, -10, 1), new Vector3(8.0f, 8.0f, 8.0f), Key.Number1));
-            ls.Add(new Light(new Vector4(0.5f, 2, 0, 1), new Vector3(8.0f, 0.0f, 0.0f), Key.Number2));
-            ls.Add(new Light(new Vector4(0.8f, 2, 0, 1), new Vector3(0.0f, 8.0f, 0.0f), Key.Number3));
-            ls.Add(new Light(new Vector4(1, 2, 0, 1), new Vector3(0.0f, 0.0f, 8.0f), Key.Number4));
+            ls.Add(new Light(new Vector4(0, 2, 0, 1), new Vector3(8.0f, 8.0f, 8.0f), Vector3.Zero, Key.Number0));
+            ls.Add(new Light(new Vector4(1, 1, 1, 1), new Vector3(8.0f, 8.0f, 8.0f), new Vector3(-1.0f, -1.0f, -1.0f), Key.Number1, 12.5f, 15.0f));
+            ls.Add(new Light(new Vector4(1, 1, -1, 1), new Vector3(8.0f, 0.0f, 0.0f), new Vector3(-1.0f, -1.0f, 1.0f), Key.Number2, 12.5f, 15.0f));
+            ls.Add(new Light(new Vector4(-1, 1, 1, 1), new Vector3(0.0f, 8.0f, 0.0f), new Vector3(1.0f, -1.0f, -1.0f), Key.Number3, 12.5f, 15.0f));
+            ls.Add(new Light(new Vector4(-1, 1, -1, 1), new Vector3(0.0f, 0.0f, 8.0f), new Vector3(1.0f, -1.0f, 1.0f), Key.Number4, 12.5f, 15.0f));
             lights = ls.ToArray();
 
-            // load teapot
+            // load turret teapot and floor
             turret = new Mesh("../../assets/teapot.obj", wood, lights);
             floor = new Mesh("../../assets/floor.obj", wood, lights);
 
-            //world.Add(turret);
+            // the floor is base of the world, with the turret as its first child
             world.Add(floor);
             floor.children.Add(turret);
 
@@ -72,6 +74,7 @@ namespace Template
 			quad = new ScreenQuad();
 		}
 
+        // build array containing the location IDs of the light variables in the glsl files
 		private UniformLight[] BuildULightArray()
         {
             List<UniformLight> list = new List<UniformLight>();
@@ -88,32 +91,39 @@ namespace Template
             mouseState = Mouse.GetState();
             keyState = Keyboard.GetState();
 
+            // shoot bullets by clicking the left mouse button or by pressing space
             if (LeftMouseKeyPressed() || KeyPressed(Key.Space))
                 MakeBullet();
 
+            // check if lights should be switched off
             for (int i = 0; i < lights.Length; i++)
             {
                 if (KeyPressed(lights[i].key))
                     lights[i].Switch();
             }
 
-            if (KeyDown(Key.A)) cam_x += 0.2f;  // Move left
-            if (KeyDown(Key.D)) cam_x -= 0.2f;  // Move right
-            if (KeyDown(Key.W)) cam_z += 0.2f;  // Move up
-            if (KeyDown(Key.S)) cam_z -= 0.2f;  // Move down
-            if (KeyDown(Key.Z)) { cam_x = 0.0f; cam_z = 0.0f; }  // Reset Position
+            if (KeyPressed(Key.M))
+                if (useRenderTarget)
+                    useRenderTarget = false;                        // Switch post-proc
+                else useRenderTarget = true;
 
-            if (KeyDown(Key.Q)) cam_y += 0.2f;  // Zoom in
-            if (KeyDown(Key.E)) cam_y -= 0.2f;  // Zoom out
-            if (KeyDown(Key.X)) cam_y = 0.0f;   // Reset Zoom
+            if (KeyDown(Key.A)) cam_x += 0.2f;                      // Move left
+            if (KeyDown(Key.D)) cam_x -= 0.2f;                      // Move right
+            if (KeyDown(Key.W)) cam_z += 0.2f;                      // Move up
+            if (KeyDown(Key.S)) cam_z -= 0.2f;                      // Move down
+            if (KeyDown(Key.Z)) { cam_x = 0.0f; cam_z = 0.0f; }     // Reset Position
 
-            if (KeyDown(Key.R)) cam_rot -= 0.03f;  // Rotate camera left
-            if (KeyDown(Key.F)) cam_rot += 0.03f;  // Rotate camera right
-            if (KeyPressed(Key.C)) cam_rot = 0.0f; // Reset camera rotation
+            if (KeyDown(Key.Q)) cam_y += 0.2f;                      // Zoom in
+            if (KeyDown(Key.E)) cam_y -= 0.2f;                      // Zoom out
+            if (KeyDown(Key.X)) cam_y = 0.0f;                       // Reset Zoom
 
-            if (KeyDown(Key.Left)) turret_rot -= 0.05f;  // Rotate turret left
-            if (KeyDown(Key.Right)) turret_rot += 0.05f; // Rotate turret right
-            if (KeyPressed(Key.Down)) turret_rot = 0.0f; // Reset turret rotation
+            if (KeyDown(Key.R)) cam_rot -= 0.03f;                   // Rotate camera left
+            if (KeyDown(Key.F)) cam_rot += 0.03f;                   // Rotate camera right
+            if (KeyPressed(Key.C)) cam_rot = 0.0f;                  // Reset camera rotation
+
+            if (KeyDown(Key.Left)) turret_rot -= 0.05f;             // Rotate turret left
+            if (KeyDown(Key.Right)) turret_rot += 0.05f;            // Rotate turret right
+            if (KeyPressed(Key.Down)) turret_rot = 0.0f;            // Reset turret rotation
 
             lastMouseState = mouseState;
             lastKeyState = keyState;
@@ -144,8 +154,6 @@ namespace Template
                 new Vector4(-(float)Math.Sin(turret_rot), 0, (float)Math.Cos(turret_rot), 0),
                 new Vector4(0, 0, 0, 1));
 
-            //Matrix4 Tpot = Matrix4.CreateScale( 0.5f ) * Matrix4.CreateFromAxisAngle( new Vector3( 0, 1, 0 ), a );
-            //Matrix4 Tfloor = Matrix4.CreateScale( 1.0f ) * Matrix4.CreateFromAxisAngle( new Vector3( 0, 1, 0 ), a );
             turret.local = Matrix4.CreateScale(.125f) * Matrix4.CreateTranslation(new Vector3(0, -2.0f, 0)) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), 0) * turretRotation;
             floor.local = Matrix4.CreateScale(4.0f) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), 0);
 
@@ -167,8 +175,6 @@ namespace Template
 				target.Bind();
 
                 // render scene to render target
-                //turret.Render( shader, Tpot * Tcamera * Tview );
-                //floor.Render( shader, Tfloor * Tcamera * Tview );
                 scene.Render(world, shader, camRotation * Tcamera * Tview, viewPos);
 
                 // render quad
@@ -178,12 +184,11 @@ namespace Template
 			else
 			{
                 // render scene directly to the screen
-                //turret.Render( shader, Tpot * Tcamera * Tview );
-                //floor.Render( shader, Tfloor * Tcamera * Tview );
                 scene.Render( world, shader, camRotation * Tcamera * Tview, viewPos );
             }
         }
 
+        // spawn a bullet along with its orbital
         void MakeBullet()
         {
             Matrix4 turretRotation = new Matrix4(
@@ -202,8 +207,9 @@ namespace Template
             Bullet bullet = new Bullet ("../../assets/teapot.obj", wood, lights, velocity);
             floor.children.Add(bullet);
 
-            bullet.local *= Matrix4.CreateTranslation(new Vector3(bulletSpawnDistanceFromTurretCenter, 0, 0)) * turretRotation2;
+            bullet.local *= Matrix4.CreateTranslation(new Vector3(bulletSpawnDistanceFromTurretCenter, -2.0f, 0)) * turretRotation2;
 
+            // every bullet will spawn an orbital
             Mesh orbital = new Mesh("../../assets/teapot.obj", wood, lights);
             bullet.children.Add(orbital);
         }
@@ -215,31 +221,31 @@ namespace Template
             {
                 if (child.GetType() == typeof(Bullet))
                 {
-                    if ((child.local * new Vector4(1, 0, 0, 0)).Length > bulletDespawnDistance)
+                    // get the indices of the bullets that should be removed from the world
+                    if (Math.Abs(child.local[3, 0]) + Math.Abs(child.local[3, 2]) > bulletDespawnDistance)
                     {
                         indexBullets.Add(floor.children.IndexOf(child));
                         continue;
                     }
 
+                    // update rotation of the orbitals
                     foreach (Mesh orbital in child.children)
                     {
                         float frameDuration = timer.ElapsedMilliseconds;
-
-                        // update rotation of the orbitals
                         child.a += 0.004f * frameDuration;
                         if (child.a > 2 * PI) child.a -= 2 * PI;
-
                         orbital.local = Matrix4.CreateScale(.4f) * Matrix4.CreateTranslation(new Vector3(0, 0, 10)) * Matrix4.CreateFromAxisAngle(new Vector3(0, 1, 0), child.a);
                     }
                 }
             }
 
+            // reverse the list so the indices go from high to low
             indexBullets.Reverse();
 
+            // remove the bullet at each index in the list
             foreach (int index in indexBullets)
             {
                 floor.children.RemoveAt(index);
-                Console.WriteLine("removed");
             }
         }
     }

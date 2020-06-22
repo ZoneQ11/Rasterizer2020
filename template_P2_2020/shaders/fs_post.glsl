@@ -10,15 +10,13 @@ out vec3 outputColor;
 
 void main()
 {
-	// retrieve input pixel
-	//outputColor = texture( pixels, uv ).rgb;
-	// apply dummy postprocessing effect
-	//float dist = P.x * P.x + P.y * P.y;
-	//outputColor *= sin( dist * 50 ) * 0.25f + 0.75f;
-	vec4 r = texture( pixels, vec2 (uv[0], uv[1]) );
+	// retrieve input pixel	
+	vec4 r = texture( pixels, vec2 (uv[0] - 0.000f, uv[1] - 0.000f) );
+	vec4 g = texture( pixels, vec2 (uv[0] - 0.001f, uv[1] - 0.001f) );
+	vec4 b = texture( pixels, vec2 (uv[0] - 0.002f, uv[1] - 0.002f) );
 
-	outputColor = vec3(r.r, r.g, r.b);
-	outputColor *= 1-pow(sqrt(pow(uv[0],2)+pow(uv[1],2)),1.5);
+	outputColor = vec3(r.r, g.g, b.b);
+	outputColor *= 1-pow(sqrt(pow(P[0],2)+pow(P[1],2)),1.5);
 }
 
 // EOF

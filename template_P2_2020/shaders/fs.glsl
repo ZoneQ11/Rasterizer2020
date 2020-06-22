@@ -18,28 +18,61 @@ uniform vec3 ambient = vec3(0.05f,0.05f,0.05f);
 struct Light {
 	vec4 pos;
 	vec3 col;
-	//vec3 dir;
+	vec3 dir;
+	float cutOff;
+	float outerCutOff;
 };
 
 uniform Light lights[20];
 
 vec4 calcLight (Light l)
 {
-	vec3 L  = l.pos.xyz - worldPos.xyz;
-	vec3 normal = normalize(normal.xyz);
-	float dist = L.length();
-
-	L = normalize( L );
+	vec4 pixelColor;
 	vec3 materialColor = texture( pixels, uv ).xyz;
-	float attenuation = 1.0f / (dist * dist);
+	vec3 normal = normalize(normal.xyz);
+	
+	if(l.dir == vec3(0,0,0))
+	{
+		vec3 L  = l.pos.xyz - worldPos.xyz;
+		float dist = L.length();
+		float attenuation = 1.0f / (dist * dist);
 
-	vec3 Rv = reflect(-L,normal);
-	vec3 viewDir = normalize(viewPos - worldPos.xyz);
+		L = normalize( L );
+		vec3 Rv = reflect(-L,normal);
+		vec3 viewDir = normalize(viewPos - worldPos.xyz);
+		
+		vec3 standard = materialColor * attenuation * l.col;
+		vec3 diffuse = standard * max( 0.0f, dot( L, normal ) );
+		vec3 specular = standard * pow( max( 0.0f, dot( viewDir, Rv ) ), 128.0f);
+		pixelColor = vec4( diffuse + specular, 1);
+	}
+	else
+	{
+		vec3 D  = l.pos.xyz - worldPos.xyz;
+		float dist = D.length();
 
-	vec3 diffuse = materialColor * attenuation * l.col * max( 0.0f, dot( L, normal ) );
-	vec3 specular = materialColor * attenuation * l.col * pow( max( 0.0f, dot( viewDir, Rv ) ), 128.0f);
+		vec3 L  = normalize(-l.dir);
+		float theta = dot(normalize(D), L);
+		float epsilon = l.cutOff - l.outerCutOff;
+		float intensity = clamp((theta - l.outerCutOff) / epsilon, 0.0f, 1.0f);
 
-	vec4 pixelColor = vec4( diffuse + specular, 1);
+		if (theta > l.outerCutOff)
+		{
+			float attenuation = 1.0f / (dist * dist);
+
+			vec3 Rv = reflect(-L,normal);
+			vec3 viewDir = normalize(viewPos - worldPos.xyz);
+
+			vec3 standard = materialColor * attenuation * l.col * intensity;
+			vec3 diffuse = standard * max( 0.0f, dot( L, normal ) );
+			vec3 specular = standard * pow( max( 0.0f, dot( viewDir, Rv ) ), 128.0f);
+			pixelColor = vec4( diffuse + specular, 1);
+		}
+		else
+		{
+			pixelColor = vec4(0,0,0,0);
+		}
+	}
 	return pixelColor;
 }
 

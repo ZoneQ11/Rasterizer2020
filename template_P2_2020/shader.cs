@@ -37,7 +37,9 @@ namespace Template
             {
                 uLights[i].lpos = GL.GetUniformLocation(programID, $"lights[{i}].pos");
                 uLights[i].lcol = GL.GetUniformLocation(programID, $"lights[{i}].col");
-                //uLights[i].ldir = GL.GetUniformLocation(programID, $"lights[{i}].dir");
+                uLights[i].ldir = GL.GetUniformLocation(programID, $"lights[{i}].dir");
+                uLights[i].cutOff = GL.GetUniformLocation(programID, $"lights[{i}].cutOff");
+                uLights[i].outerCutOff = GL.GetUniformLocation(programID, $"lights[{i}].outerCutOff");
             }
         }
 

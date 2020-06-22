@@ -5,6 +5,7 @@ namespace Template
 {
     public class SceneGraph
     {
+        // recursively renders the mesh and its children's mesh
         public void Render(List<Mesh> parent, Shader shader, Matrix4 transform, Vector3 viewPos)
         {
             foreach (var child in parent)
